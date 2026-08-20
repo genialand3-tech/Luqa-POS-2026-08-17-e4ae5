@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "928507204772",
+    "project_id": "luqa-pos",
+    "storage_bucket": "luqa-pos.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:928507204772:android:395707503c32ce32c70231",
+        "android_client_info": {
+          "package_name": "com.aistudio.luqapos.mpos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPOHgOWPF1BbShwMTUHwJGZkp5MJZRdFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
