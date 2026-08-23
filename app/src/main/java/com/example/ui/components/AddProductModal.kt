@@ -1,5 +1,9 @@
 package com.example.ui.components
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +27,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -42,6 +47,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,15 +56,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
 import com.example.ui.theme.LuqaOnPrimary
 import com.example.ui.theme.LuqaPrimary
 import com.example.ui.theme.LuqaSurfaceContainerLow
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import java.io.File
 
 @Composable
 fun AddProductModal(
     availableCategories: List<String> = listOf("Bebidas", "Comida", "Snacks", "Postres", "Despensa"),
     onDismiss: () -> Unit,
-    onSave: (name: String, category: String, cost: Double, price: Double, stock: Int, sku: String, barcode: String) -> Unit
+    onSave: (name: String, category: String, cost: Double, price: Double, stock: Int, sku: String, barcode: String, imageUrl: String?) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var category by remember { mutableStateOf(availableCategories.firstOrNull() ?: "General") }
@@ -69,6 +80,69 @@ fun AddProductModal(
 
     var expandedCategoryDropdown by remember { mutableStateOf(false) }
     val categories = availableCategories.ifEmpty { listOf("General") }
+
+    val context = LocalContext.current
+    val scanner = remember { GmsBarcodeScanning.getClient(context) }
+
+    var showPhotoOptions by remember { mutableStateOf(false) }
+    var photoUri by remember { mutableStateOf<Uri?>(null) }
+    var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                photoUri = uri
+            }
+        }
+    )
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if (success) {
+                photoUri = tempPhotoUri
+            }
+        }
+    )
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                val tmpFile = File.createTempFile("prod_", ".jpg", context.cacheDir)
+                val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tmpFile)
+                tempPhotoUri = uri
+                cameraLauncher.launch(uri)
+            } else {
+                Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
+    if (showPhotoOptions) {
+        AlertDialog(
+            onDismissRequest = { showPhotoOptions = false },
+            title = { Text("Subir Foto") },
+            text = { Text("Elige una opción para la foto del producto.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPhotoOptions = false
+                    permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                }) {
+                    Text("Tomar Foto")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPhotoOptions = false
+                    galleryLauncher.launch(androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }) {
+                    Text("De Galería")
+                }
+            }
+        )
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -131,30 +205,39 @@ fun AddProductModal(
                                 color = Color(0xFFC3C6D5),
                                 shape = RoundedCornerShape(16.dp)
                             )
-                            .clickable { },
+                            .clickable { showPhotoOptions = true },
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.AddAPhoto,
-                                contentDescription = null,
-                                tint = LuqaPrimary,
-                                modifier = Modifier.size(44.dp)
+                        if (photoUri != null) {
+                            AsyncImage(
+                                model = photoUri,
+                                contentDescription = "Foto",
+                                modifier = Modifier.fillMaxWidth().height(160.dp),
+                                contentScale = ContentScale.Crop
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Subir Foto del Producto",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = LuqaPrimary
-                            )
-                            Text(
-                                text = "PNG, JPG hasta 5MB",
-                                fontSize = 14.sp,
-                                color = Color(0xFF4B5563)
-                            )
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.AddAPhoto,
+                                    contentDescription = null,
+                                    tint = LuqaPrimary,
+                                    modifier = Modifier.size(44.dp)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Subir Foto del Producto",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = LuqaPrimary
+                                )
+                                Text(
+                                    text = "PNG, JPG hasta 5MB",
+                                    fontSize = 14.sp,
+                                    color = Color(0xFF4B5563)
+                                )
+                            }
                         }
                     }
 
@@ -252,11 +335,21 @@ fun AddProductModal(
                                 onValueChange = { barcode = it },
                                 placeholder = { Text("Escanear o ingresar") },
                                 trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.QrCodeScanner,
-                                        contentDescription = "Barcode",
-                                        tint = LuqaPrimary
-                                    )
+                                    IconButton(onClick = {
+                                        scanner.startScan()
+                                            .addOnSuccessListener { bc ->
+                                                bc.rawValue?.let { barcode = it }
+                                            }
+                                            .addOnFailureListener { e ->
+                                                Toast.makeText(context, "Error al escanear: ${e.message}", Toast.LENGTH_SHORT).show()
+                                            }
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.QrCodeScanner,
+                                            contentDescription = "Barcode",
+                                            tint = LuqaPrimary
+                                        )
+                                    }
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -418,7 +511,7 @@ fun AddProductModal(
                             val priceVal = priceText.toDoubleOrNull() ?: 0.0
                             val stockVal = stockText.toIntOrNull() ?: 0
                             if (name.isNotBlank() && priceVal > 0) {
-                                onSave(name, category, costVal, priceVal, stockVal, sku, barcode)
+                                onSave(name, category, costVal, priceVal, stockVal, sku, barcode, photoUri?.toString())
                             }
                         },
                         modifier = Modifier

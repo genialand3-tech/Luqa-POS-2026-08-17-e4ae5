@@ -106,7 +106,8 @@ dependencies {
   implementation(libs.logging.interceptor)
   implementation(libs.moshi.kotlin)
   implementation(libs.okhttp)
-  // implementation(libs.play.services.location)
+  implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
+  // implementation(libs.play-services-location)
   implementation(libs.retrofit)
   testImplementation(libs.androidx.compose.ui.test.junit4)
   testImplementation(libs.androidx.core)
@@ -127,3 +128,5 @@ dependencies {
   "ksp"(libs.androidx.room.compiler)
   "ksp"(libs.moshi.kotlin.codegen)
 }
+
+    implementation("io.coil-kt:coil-compose:2.5.0")

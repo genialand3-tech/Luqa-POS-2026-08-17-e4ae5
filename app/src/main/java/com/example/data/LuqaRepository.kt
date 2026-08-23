@@ -174,28 +174,8 @@ class LuqaRepository {
     }
 
     // FIRESTORE MUTATIONS
-    fun createNewProduct(
-        name: String,
-        category: String,
-        cost: Double,
-        price: Double,
-        stock: Int,
-        sku: String,
-        barcode: String
-    ) {
+    fun createNewProduct(newProduct: Product) {
         val tid = tenantId ?: return
-        val newProduct = Product(
-            id = UUID.randomUUID().toString(),
-            name = name,
-            category = category.ifBlank { "General" },
-            cost = cost,
-            price = price,
-            stock = stock,
-            sku = sku,
-            barcode = barcode,
-            placeholderText = name.take(2).uppercase(),
-            placeholderColorHex = 0xFF0046AD
-        )
         db.collection("users").document(tid).collection("products")
             .document(newProduct.id).set(newProduct)
             

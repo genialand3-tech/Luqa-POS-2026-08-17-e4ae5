@@ -1,5 +1,9 @@
 package com.example.ui.components
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
@@ -27,6 +32,7 @@ import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -41,7 +47,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,6 +54,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,11 +63,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
 import com.example.model.Product
 import com.example.ui.theme.LuqaOnPrimary
 import com.example.ui.theme.LuqaPrimary
 import com.example.ui.theme.LuqaSecondary
 import com.example.ui.theme.LuqaSurfaceContainerLow
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import java.io.File
 
 @Composable
 fun EditProductModal(
@@ -82,6 +93,70 @@ fun EditProductModal(
 
     var expandedCategoryDropdown by remember { mutableStateOf(false) }
     val categories = availableCategories.ifEmpty { listOf("General") }
+
+    // Camera and Photo Logic
+    val context = LocalContext.current
+    val scanner = remember { GmsBarcodeScanning.getClient(context) }
+    
+    var showPhotoOptions by remember { mutableStateOf(false) }
+    var photoUri by remember { mutableStateOf<Uri?>(if(product.imageUrl != null) Uri.parse(product.imageUrl) else null) }
+    var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                photoUri = uri
+            }
+        }
+    )
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if (success) {
+                photoUri = tempPhotoUri
+            }
+        }
+    )
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                val tmpFile = File.createTempFile("prod_", ".jpg", context.cacheDir)
+                val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tmpFile)
+                tempPhotoUri = uri
+                cameraLauncher.launch(uri)
+            } else {
+                Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
+    if (showPhotoOptions) {
+        AlertDialog(
+            onDismissRequest = { showPhotoOptions = false },
+            title = { Text("Subir Foto") },
+            text = { Text("Elige una opción para la foto del producto.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPhotoOptions = false
+                    permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                }) {
+                    Text("Tomar Foto")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showPhotoOptions = false
+                    galleryLauncher.launch(androidx.activity.result.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }) {
+                    Text("De Galería")
+                }
+            }
+        )
+    }
 
     // Calculated values
     val currentCost = costText.toDoubleOrNull() ?: 0.0
@@ -149,6 +224,49 @@ fun EditProductModal(
                         .padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    // Photo Upload
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(160.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(LuqaSurfaceContainerLow)
+                            .border(
+                                width = 1.5.dp,
+                                color = Color(0xFFC3C6D5),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .clickable { showPhotoOptions = true },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (photoUri != null) {
+                            AsyncImage(
+                                model = photoUri,
+                                contentDescription = "Foto",
+                                modifier = Modifier.fillMaxWidth().height(160.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.AddAPhoto,
+                                    contentDescription = null,
+                                    tint = LuqaPrimary,
+                                    modifier = Modifier.size(44.dp)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Actualizar Foto del Producto",
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = LuqaPrimary
+                                )
+                            }
+                        }
+                    }
+
                     // SECTION 1: ESTADO DEL PRODUCTO / VIGENCIA
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -582,6 +700,43 @@ fun EditProductModal(
                                 unfocusedBorderColor = Color(0xFFCBD5E1)
                             )
                         )
+                        
+                        Text(
+                            text = "Código de Barras",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF334155)
+                        )
+                        OutlinedTextField(
+                            value = barcode,
+                            onValueChange = { barcode = it },
+                            trailingIcon = {
+                                IconButton(onClick = {
+                                    scanner.startScan()
+                                        .addOnSuccessListener { bc ->
+                                            bc.rawValue?.let { barcode = it }
+                                        }
+                                        .addOnFailureListener { e ->
+                                            Toast.makeText(context, "Error al escanear: ${e.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Filled.QrCodeScanner,
+                                        contentDescription = "Barcode",
+                                        tint = LuqaPrimary
+                                    )
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("input_edit_product_barcode"),
+                            shape = RoundedCornerShape(10.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = LuqaPrimary,
+                                unfocusedBorderColor = Color(0xFFCBD5E1)
+                            )
+                        )
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -705,7 +860,8 @@ fun EditProductModal(
                                     minStockThreshold = minStockText.toIntOrNull() ?: 5,
                                     sku = sku,
                                     barcode = barcode,
-                                    isActive = isActive
+                                    isActive = isActive,
+                                    imageUrl = photoUri?.toString()
                                 )
                                 onSave(updated)
                             }

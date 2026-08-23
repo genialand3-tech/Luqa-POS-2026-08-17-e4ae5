@@ -248,12 +248,27 @@ fun VentasScreen(
                         )
                     )
 
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    val scanner = androidx.compose.runtime.remember {
+                        com.google.mlkit.vision.codescanner.GmsBarcodeScanning.getClient(context)
+                    }
+
                     Box(
                         modifier = Modifier
                             .size(56.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(LuqaSurfaceContainerLow)
-                            .clickable { },
+                            .clickable {
+                                scanner.startScan()
+                                    .addOnSuccessListener { barcode ->
+                                        barcode.rawValue?.let {
+                                            viewModel.setSearchQuery(it)
+                                        }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        android.widget.Toast.makeText(context, "Error al escanear: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

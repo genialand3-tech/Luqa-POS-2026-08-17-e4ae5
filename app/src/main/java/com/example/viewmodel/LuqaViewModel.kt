@@ -221,9 +221,26 @@ class LuqaViewModel(
         price: Double,
         stock: Int,
         sku: String,
-        barcode: String
+        barcode: String,
+        imageUrl: String? = null
     ) {
-        repository.createNewProduct(name, category, cost, price, stock, sku, barcode)
+        val colors = listOf(0xFFE2E2EB, 0xFFFFD7D7, 0xFFD7FFD9, 0xFFFFF8D7, 0xFFE2D7FF)
+        val newProduct = Product(
+            id = java.util.UUID.randomUUID().toString(),
+            name = name,
+            category = category,
+            cost = cost,
+            price = price,
+            stock = stock,
+            sku = sku,
+            barcode = barcode,
+            imageUrl = imageUrl,
+            placeholderText = name.take(2).uppercase(),
+            placeholderColorHex = colors.random()
+        )
+        viewModelScope.launch {
+            repository.createNewProduct(newProduct)
+        }
         _showAddProductModal.value = false
     }
 

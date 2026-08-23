@@ -122,8 +122,8 @@ fun LuqaApp(viewModel: LuqaViewModel) {
             AddProductModal(
                 availableCategories = categories,
                 onDismiss = { viewModel.dismissAddProductModal() },
-                onSave = { name, category, cost, price, stock, sku, barcode ->
-                    viewModel.saveProduct(name, category, cost, price, stock, sku, barcode)
+                onSave = { name, category, cost, price, stock, sku, barcode, imageUrl ->
+                    viewModel.saveProduct(name, category, cost, price, stock, sku, barcode, imageUrl)
                 }
             )
         }
