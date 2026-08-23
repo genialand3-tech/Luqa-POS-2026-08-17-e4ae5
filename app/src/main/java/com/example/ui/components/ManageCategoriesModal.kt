@@ -151,7 +151,7 @@ fun ManageCategoriesModal(
                             placeholder = { Text("Ej. Bebidas Frías") },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(50.dp)
+                                .height(56.dp)
                                 .testTag("input_new_category"),
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true,
@@ -174,7 +174,7 @@ fun ManageCategoriesModal(
                             colors = ButtonDefaults.buttonColors(containerColor = LuqaPrimary),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
-                                .height(50.dp)
+                                .height(56.dp)
                                 .testTag("btn_add_category")
                         ) {
                             Icon(

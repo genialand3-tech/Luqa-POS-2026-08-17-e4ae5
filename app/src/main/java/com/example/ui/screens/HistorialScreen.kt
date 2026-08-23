@@ -425,7 +425,7 @@ fun HistorialScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(56.dp)
                 .testTag("input_search_historial"),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,

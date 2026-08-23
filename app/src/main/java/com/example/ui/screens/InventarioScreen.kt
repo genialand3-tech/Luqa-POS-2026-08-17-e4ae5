@@ -366,7 +366,7 @@ fun InventarioScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(56.dp)
                     .testTag("inventory_search_input"),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,

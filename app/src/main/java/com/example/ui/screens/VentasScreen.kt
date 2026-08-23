@@ -236,7 +236,7 @@ fun VentasScreen(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .height(50.dp)
+                            .height(56.dp)
                             .testTag("search_input"),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
@@ -250,7 +250,7 @@ fun VentasScreen(
 
                     Box(
                         modifier = Modifier
-                            .size(50.dp)
+                            .size(56.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(LuqaSurfaceContainerLow)
                             .clickable { },
