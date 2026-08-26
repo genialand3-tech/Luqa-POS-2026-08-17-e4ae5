@@ -424,6 +424,7 @@ fun EditProductModal(
                                         onValueChange = { priceText = it },
                                         placeholder = { Text("0.00") },
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                        visualTransformation = ThousandSeparatorVisualTransformation(),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag("input_edit_product_price"),
@@ -453,6 +454,7 @@ fun EditProductModal(
                                         onValueChange = { costText = it },
                                         placeholder = { Text("0.00") },
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                        visualTransformation = ThousandSeparatorVisualTransformation(),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .testTag("input_edit_product_cost"),

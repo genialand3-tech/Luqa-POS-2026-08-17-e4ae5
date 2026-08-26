@@ -73,7 +73,7 @@ fun AddProductModal(
     var name by remember { mutableStateOf("") }
     var category by remember { mutableStateOf(availableCategories.firstOrNull() ?: "General") }
     var barcode by remember { mutableStateOf("") }
-    var sku by remember { mutableStateOf("") }
+    var sku by remember { mutableStateOf("SKU-${System.currentTimeMillis()}") }
     var costText by remember { mutableStateOf("") }
     var priceText by remember { mutableStateOf("") }
     var stockText by remember { mutableStateOf("") }
@@ -390,7 +390,7 @@ fun AddProductModal(
                         }
                     }
 
-                    // Cost, Price, Stock Row
+                    // Cost & Price Row
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -410,6 +410,7 @@ fun AddProductModal(
                                 onValueChange = { costText = it },
                                 placeholder = { Text("0.00") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                visualTransformation = ThousandSeparatorVisualTransformation(),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .testTag("input_product_cost"),
@@ -437,6 +438,7 @@ fun AddProductModal(
                                 onValueChange = { priceText = it },
                                 placeholder = { Text("0.00") },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                visualTransformation = ThousandSeparatorVisualTransformation(),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .testTag("input_product_price"),
@@ -448,33 +450,34 @@ fun AddProductModal(
                                 )
                             )
                         }
+                    }
 
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Text(
-                                text = "Stock Inicial",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF191B22)
+                    // Stock
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "Stock Inicial",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF191B22)
+                        )
+                        OutlinedTextField(
+                            value = stockText,
+                            onValueChange = { stockText = it },
+                            placeholder = { Text("0") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("input_product_stock"),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = LuqaPrimary,
+                                unfocusedBorderColor = Color(0xFFC3C6D5)
                             )
-                            OutlinedTextField(
-                                value = stockText,
-                                onValueChange = { stockText = it },
-                                placeholder = { Text("0") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag("input_product_stock"),
-                                shape = RoundedCornerShape(12.dp),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = LuqaPrimary,
-                                    unfocusedBorderColor = Color(0xFFC3C6D5)
-                                )
-                            )
-                        }
+                        )
                     }
                 }
 
