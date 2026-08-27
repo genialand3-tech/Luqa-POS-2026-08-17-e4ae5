@@ -34,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Logout
 
 class MainActivity : ComponentActivity() {
 
@@ -55,15 +57,22 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(currentUid) {
                         viewModel.initializeWithTenant(currentUid!!)
                     }
-                    LuqaApp(viewModel = viewModel)
+                    LuqaApp(
+                        viewModel = viewModel,
+                        onLogout = {
+                            FirebaseAuth.getInstance().signOut()
+                            currentUid = null
+                        }
+                    )
                 }
             }
         }
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
-fun LuqaApp(viewModel: LuqaViewModel) {
+fun LuqaApp(viewModel: LuqaViewModel, onLogout: () -> Unit) {
     val currentNav by viewModel.currentNav.collectAsState()
     val showSuccessModal by viewModel.showSuccessModal.collectAsState()
     val showReceiptModal by viewModel.showReceiptModal.collectAsState()
@@ -75,6 +84,24 @@ fun LuqaApp(viewModel: LuqaViewModel) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = {
+            androidx.compose.material3.TopAppBar(
+                title = { androidx.compose.material3.Text("Luqa POS") },
+                actions = {
+                    androidx.compose.material3.IconButton(onClick = onLogout) {
+                        androidx.compose.material3.Icon(
+                            imageVector = Icons.Filled.Logout,
+                            contentDescription = "Cerrar Sesión"
+                        )
+                    }
+                },
+                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                    titleContentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        },
         bottomBar = {
             BottomNavigationBar(
                 currentNav = currentNav,
