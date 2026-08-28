@@ -23,11 +23,11 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Generate Signing Report
-        run: gradle signingReport
-
       - name: Build Debug APK
         run: gradle assembleDebug
+
+      - name: Generate Signing Report
+        run: gradle signingReport
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
