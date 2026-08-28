@@ -23,6 +23,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Generate Signing Report
+        run: gradle signingReport
+
       - name: Build Debug APK
         run: gradle assembleDebug
 
