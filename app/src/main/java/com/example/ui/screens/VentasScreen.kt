@@ -641,7 +641,9 @@ private fun ProductCard(
                         contentDescription = product.name,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        alpha = if (product.isOutOfStock) 0.4f else 1.0f
+                        alpha = if (product.isOutOfStock) 0.4f else 1.0f,
+                        placeholder = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_gallery),
+                        error = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_report_image)
                     )
                 } else if (product.placeholderText != null) {
                     Text(

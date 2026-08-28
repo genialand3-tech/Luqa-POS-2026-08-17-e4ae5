@@ -244,7 +244,9 @@ fun EditProductModal(
                                 model = photoUri,
                                 contentDescription = "Foto",
                                 modifier = Modifier.fillMaxWidth().height(160.dp),
-                                contentScale = ContentScale.Crop
+                                contentScale = ContentScale.Crop,
+                                placeholder = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_gallery),
+                                error = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_report_image)
                             )
                         } else {
                             Column(

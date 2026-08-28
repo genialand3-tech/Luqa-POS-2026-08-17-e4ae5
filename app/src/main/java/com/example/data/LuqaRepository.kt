@@ -505,6 +505,7 @@ class LuqaRepository {
                         val stock = parts[4].toIntOrNull() ?: 0
                         val sku = if (parts.size > 5) parts[5] else ""
                         val barcode = if (parts.size > 6) parts[6] else ""
+                        val imageUrl = if (parts.size > 7 && parts[7].isNotBlank()) parts[7] else null
 
                         val existing = _products.value.find {
                             (sku.isNotBlank() && it.sku == sku) ||
@@ -518,6 +519,7 @@ class LuqaRepository {
                                 cost = if (cost > 0) cost else existing.cost,
                                 price = if (price > 0) price else existing.price,
                                 category = category,
+                                imageUrl = imageUrl ?: existing.imageUrl,
                                 isActive = true
                             )
                             val ref = db.collection("users").document(tid).collection("products").document(existing.id)
@@ -534,6 +536,7 @@ class LuqaRepository {
                                 stock = stock,
                                 sku = sku,
                                 barcode = barcode,
+                                imageUrl = imageUrl,
                                 isActive = true
                             )
                             val ref = db.collection("users").document(tid).collection("products").document(newId)

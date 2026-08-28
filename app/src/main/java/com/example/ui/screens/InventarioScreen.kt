@@ -470,7 +470,7 @@ fun InventarioScreen(
                     Text("Para importar productos masivamente, asegúrate de que el archivo CSV tenga las siguientes columnas en este orden exacto:")
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "1. Nombre\n2. Categoria\n3. Costo\n4. Precio\n5. Stock\n6. SKU (Opcional)\n7. CodigoBarras (Opcional)",
+                        text = "1. Nombre\n2. Categoria\n3. Costo\n4. Precio\n5. Stock\n6. SKU (Opcional)\n7. CodigoBarras (Opcional)\n8. Imagen URL (Opcional)",
                         fontWeight = FontWeight.Bold,
                         color = LuqaPrimary
                     )
@@ -535,7 +535,9 @@ private fun InventoryProductCard(
                         contentDescription = product.name,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        alpha = if (product.isActive) 1.0f else 0.5f
+                        alpha = if (product.isActive) 1.0f else 0.5f,
+                        placeholder = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_gallery),
+                        error = androidx.compose.ui.res.painterResource(android.R.drawable.ic_menu_report_image)
                     )
                 } else if (product.placeholderText != null) {
                     Text(
