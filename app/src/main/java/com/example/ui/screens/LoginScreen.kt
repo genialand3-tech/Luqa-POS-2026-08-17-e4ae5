@@ -275,8 +275,13 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                             modifier = Modifier.size(24.dp),
                             tint = androidx.compose.ui.graphics.Color.Unspecified
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text("Continuar con Google", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Continuar con Google",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
