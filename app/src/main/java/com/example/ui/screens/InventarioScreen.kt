@@ -189,65 +189,7 @@ fun InventarioScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    IconButton(
-                        onClick = { showClearInventoryDialog = true },
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFFFEBEE))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Delete,
-                            contentDescription = "Eliminar inventario",
-                            tint = Color.Red
-                        )
-                    }
-                    IconButton(
-                        onClick = {
-                        viewModel.exportInventoryToCsv(context) { uri ->
-                            if (uri != null) {
-                                val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                    type = "text/csv"
-                                    putExtra(android.content.Intent.EXTRA_STREAM, uri)
-                                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                }
-                                context.startActivity(android.content.Intent.createChooser(intent, "Exportar Inventario"))
-                            } else {
-                                Toast.makeText(context, "Error al exportar inventario", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    },
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(LuqaPrimary.copy(alpha = 0.1f)),
-                    colors = IconButtonDefaults.iconButtonColors(contentColor = LuqaPrimary)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Send,
-                        contentDescription = "Exportar CSV"
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(
-                    onClick = { showCsvFormatDialog = true },
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(LuqaPrimary.copy(alpha = 0.1f)),
-                    colors = IconButtonDefaults.iconButtonColors(contentColor = LuqaPrimary)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.UploadFile,
-                        contentDescription = "Importar CSV"
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
                 Button(
                     onClick = { viewModel.openAddProductModal() },
@@ -275,6 +217,67 @@ fun InventarioScreen(
                 }
             }
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    IconButton(
+                        onClick = { showClearInventoryDialog = true },
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFFFEBEE))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Eliminar inventario",
+                            tint = Color.Red
+                        )
+                    }
+
+                    IconButton(
+                        onClick = {
+                            viewModel.exportInventoryToCsv(context) { uri ->
+                                if (uri != null) {
+                                    val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                        type = "text/csv"
+                                        putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                                        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    }
+                                    context.startActivity(android.content.Intent.createChooser(intent, "Exportar Inventario"))
+                                } else {
+                                    Toast.makeText(context, "Error al exportar inventario", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(LuqaPrimary.copy(alpha = 0.1f)),
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = LuqaPrimary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Send,
+                            contentDescription = "Exportar CSV"
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { showCsvFormatDialog = true },
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(LuqaPrimary.copy(alpha = 0.1f)),
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = LuqaPrimary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.UploadFile,
+                            contentDescription = "Importar CSV"
+                        )
+                    }
+                }
             }
             // Low Inventory Alert Banner
             if (lowStockProducts.isNotEmpty() || outOfStockProducts.isNotEmpty()) {
