@@ -1,0 +1,10 @@
+name: Obtener Huellas SHA
+on: workflow_dispatch
+jobs:
+  huellas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decodificar llave y leer huella
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > temporal.jks
+          keytool -list -v -keystore temporal.jks -alias upload -storepass luqapos123 -keypass luqapos123
