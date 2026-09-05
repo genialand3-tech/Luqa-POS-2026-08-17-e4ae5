@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "928507204772-16nk6cdl0hhkqtap7u124m5gqhc2pb1b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aistudio.luqapos.mpos",
+            "certificate_hash": "8e89732a66d6694969d4c9a42ad57f9becf563db"
+          }
+        },
+        {
           "client_id": "928507204772-5oji7s351qeo17u3l0sjiso4s4hl8o9s.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -43,14 +51,6 @@
           "android_info": {
             "package_name": "com.aistudio.luqapos.mpos",
             "certificate_hash": "8118438cebe3dc4aae0ba1d5d3705cddb95062b6"
-          }
-        },
-        {
-          "client_id": "928507204772-vee50r7r91mk91pt0sk4aktlihr7a0vt.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.aistudio.luqapos.mpos",
-            "certificate_hash": "8e739d596238be75189d4ce4323f14322ff51d6d"
           }
         },
         {
