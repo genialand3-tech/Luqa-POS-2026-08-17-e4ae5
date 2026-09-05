@@ -23,8 +23,23 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Generate Static Debug Keystore
+        run: |
+          mkdir -p ~/.android
+          keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          echo "==========================================="
+          echo "HUELLA SHA-1 DE TU NUEVO DEBUG KEYSTORE:"
+          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep "SHA1:"
+          echo "==========================================="
+
       - name: Build Debug APK
         run: gradle assembleDebug
+
+      - name: Upload Debug Keystore Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-keystore
+          path: ~/.android/debug.keystore
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
